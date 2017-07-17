@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+
+if [[ "$1" == '--help' || "$1" == '-h' || "$1" == 'help' ]]; then
+  echo "Usage: $(basename "$0") <dump-file>"
+  exit 1
+fi
+
+# Container stuff
+# docker container exec -i "${CONTAINER_ID}" bash -l -c <<'EOF'
+# Set native postgres variables
+
+export PGUSER="$POSTGRES_USER"
+export PGPASSWORD="$POSTGRES_PASSWORD"
+export PGDATABASE="$POSTGRES_DB"
+
+
+readonly RESET="\e[0m"
+readonly BOLD="\e[1m"
+readonly MAGENTA="\e[95m"
+readonly LIGHT_CYAN="\e[96m"
+
+
+function banner {
+  printf "${MAGENTA}===>${BOLD} %s ${RESET} \n" "$1"
+}
+
+
+banner "Dropping database:"
+( dropdb --echo --if-exists "$PGDATABASE" 2>&1 ) | sed 's/^/[drop] /'
+echo ""
+
+
+banner "Creating database:"
+( createdb --echo --template=template1 --owner="$PGUSER" "$PGDATABASE" 2>&1 ) | sed 's/^/[create] /'
+echo ""
+
+
+function pg_restore_cmd {
+  pg_restore \
+    --verbose \
+    --no-owner \
+    --no-privileges \
+    --dbname="$POSTGRES_DB" \
+    "$@"
+}
+
+
+if [[ -e "$1" ]]; then
+  banner "Restoring database file \"${1}\"..."
+  ( pg_restore_cmd --jobs=2 "$1" 2>&1 ) | sed 's/^/[restore] /'
+else
+  banner "Restoring database from stdin..."
+  ( pg_restore_cmd < "${1:-/dev/stdin}" 2>&1 ) | sed 's/^/[restore] /'
+fi
+
+
+echo ""
+printf "${LIGHT_CYAN} * Completed restore of${BOLD} %s ${RESET} \n" "$PGDATABASE"
