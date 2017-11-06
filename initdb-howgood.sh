@@ -34,6 +34,7 @@ for DB in template_postgis "$POSTGRES_DB" template1; do
 
   CREATE EXTENSION IF NOT EXISTS hstore;
   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  CREATE EXTENSION IF NOT EXISTS citext;
 
 EOSQL
 done
