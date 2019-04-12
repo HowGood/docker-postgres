@@ -1,6 +1,6 @@
-# howgood/postgres:9.6-alpine
+# howgood/postgres:11-alpine
 
-FROM mdillon/postgis:9.6-alpine
+FROM mdillon/postgis:11-alpine
 
 # Make sure the postgis init runs first
 RUN cd /docker-entrypoint-initdb.d \
