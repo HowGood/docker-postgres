@@ -15,6 +15,8 @@ exit_on_error = off
 restart_after_crash = on
 external_pid_file = '/tmp/postgresql.pid'
 
+client_min_messages = log
+
 # unsafe - used for testing
 fsync = off
 synchronous_commit = off
