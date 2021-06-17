@@ -17,6 +17,13 @@ external_pid_file = '/tmp/postgresql.pid'
 
 client_min_messages = log
 
+# REPLICATION
+wal_level = logical            # use logical decoding with the write-ahead log
+max_wal_senders = 4            # max number of separate processes for processing WAL changes
+max_replication_slots = 4      # max number of replication slots to be created for streaming WAL changes
+wal_keep_segments = 0          # in logfile segments, 16MB each; 0 disables
+wal_sender_timeout = 60s       # in milliseconds; 0 disables
+
 # unsafe - used for testing
 fsync = off
 synchronous_commit = off
